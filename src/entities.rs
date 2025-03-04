@@ -61,22 +61,46 @@ pub struct Filter {
 }
 
 impl Entity {
-    fn output_positions(&self)-> Vec<Position> {
+
+    fn get_positions(&self) -> Vec<Position> {
         match &self.ty {
             EntityType::TransportBelt => vec![self.position],
-            EntityType::AssemblingMachine { recipe } => todo!(),
-            EntityType::FilterInserter { filters } => todo!(),
-            EntityType::ElectricFurnace {  } => todo!(),
-            EntityType::UndergroundBelt { belt_type } => todo!(),
-            EntityType::ChemicalPlant { recipe } => todo!(),
+            EntityType::AssemblingMachine { recipe } => get_surrounding(self.position),
+            EntityType::FilterInserter { filters } => vec![self.position],
+            EntityType::ElectricFurnace {  } => get_surrounding(self.position),
+            EntityType::UndergroundBelt { belt_type } => vec![self.position],
+            EntityType::ChemicalPlant { recipe } => get_surrounding(self.position),
             EntityType::Splitter { filter, input_priority, output_priority } => todo!(),
-            EntityType::StoneWall {  } => todo!(),
+            EntityType::StoneWall {  } => vec![self.position],
+        }
+    }
+
+    fn output_positions(&self)-> Vec<Position> {
+        match &self.ty {
+            EntityType::FilterInserter { filters } => todo!(),
+            _ => self.get_positions()
+        }
+    }
+
+    fn input_positions(&self)-> Vec<Position> {
+        match &self.ty {
+            EntityType::FilterInserter { filters } => todo!(),
+            _ => self.get_positions()
         }
     }
 }
 
 fn get_surrounding(position: Position) -> Vec<Position> {
     vec![
-        
+        Position {x: position.x - 1.0, y: position.y - 1.0},
+        Position { x: position.x - 1.0, y: position.y  },
+        Position { x: position.x - 1.0, y: position.y + 1.0 },
+        Position {x: position.x, y: position.y - 1.0},
+        Position { x: position.x, y: position.y  },
+        Position { x: position.x, y: position.y + 1.0 },
+        Position {x: position.x + 1.0, y: position.y - 1.0},
+        Position { x: position.x + 1.0, y: position.y  },
+        Position { x: position.x + 1.0, y: position.y + 1.0 },
+            
     ]
 }
