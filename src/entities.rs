@@ -1,5 +1,5 @@
-use serde::{Serialize, Deserialize};
-
+use serde::{Deserialize, Serialize};
+use serde_repr::Deserialize_repr;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Position {
@@ -7,36 +7,50 @@ struct Position {
     y: f64,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct TransportBelt {
-    position: Position,
-    direction: i32,
-    entity_number: i32,
+#[derive(Debug, Serialize, Deserialize_repr)]
+#[repr(i32)]
+#[serde(untagged)]
+pub enum Direction {
+    North = 0,
+    East = 1,
+    South = 2,
+    West = 3,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-#[serde(tag = "name")]
-pub enum Entity {
-    #[serde(rename = "transport-belt")]
-    TransportBelt(TransportBelt),
-    #[serde(rename = "filter-inserter")]
-    FilterInserter(FilterInserter),
+pub struct Entity {
+    position: Position,
+    direction: Direction,
+    entity_number: i32,
+    #[serde(flatten)]
+    ty: EntityType,
+}
+
+// TODO: populate the enums here.
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(tag = "name", rename_all = "kebab-case")]
+enum EntityType {
+    TransportBelt,
     #[serde(rename = "assembling-machine-1")]
-    AssemblingMachine(AssemblingMachine),
-    #[serde(rename = "electric-furnace")]
-    ElectricFurnace(ElectricFurnace),
-    #[serde(rename = "underground-belt")]
-    UndergroundBelt(UndergroundBelt),
-    #[serde(rename = "chemical-plant")]
-    ChemicalPlant(ChemicalPlant),
-    #[serde(rename = "splitter")]
-    Splitter(Splitter),
+    AssemblingMachine {},
+    FilterInserter {},
+    ElectricFurnace {},
+    UndergroundBelt {},
+    ChemicalPlant {},
+    Splitter {},
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TransportBelt {
+    position: Position,
+    direction: Direction,
+    entity_number: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AssemblingMachine {
     position: Position,
-    direction: i32,
+    direction: Direction,
     entity_number: i32,
     recipe: String,
 }
@@ -44,14 +58,14 @@ pub struct AssemblingMachine {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ElectricFurnace {
     position: Position,
-    direction: i32,
+    direction: Direction,
     entity_number: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct UndergroundBelt {
     position: Position,
-    direction: i32,
+    direction: Direction,
     entity_number: i32,
     #[serde(rename = "type")]
     belt_type: String,
@@ -60,7 +74,7 @@ pub struct UndergroundBelt {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ChemicalPlant {
     position: Position,
-    direction: i32,
+    direction: Direction,
     entity_number: i32,
     recipe: String,
 }
@@ -68,7 +82,7 @@ pub struct ChemicalPlant {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Splitter {
     position: Position,
-    direction: i32,
+    direction: Direction,
     entity_number: i32,
     filter: String,
     input_priority: String,
@@ -78,7 +92,7 @@ pub struct Splitter {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FilterInserter {
     position: Position,
-    direction: i32,
+    direction: Direction,
     entity_number: i32,
     filters: Vec<Filter>,
 }
@@ -88,4 +102,3 @@ pub struct Filter {
     index: i32,
     name: String,
 }
-
