@@ -3,7 +3,7 @@ use serde_repr::Deserialize_repr;
 
 #[derive(Debug)]
 pub struct Blueprint {
-    entities: Vec<Entity>,
+    pub entities: Vec<Entity>,
 }
 
 impl Blueprint {
@@ -11,15 +11,15 @@ impl Blueprint {
         Blueprint { entities }
     }
 
-    pub fn entityAt(&self, pos: Position) -> Option<Entity> {
+    pub fn entityAt(&self, pos: &Position) -> Option<&Entity> {
         self.entities.iter().find(|entity| entity.get_positions().contains(pos))
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
-struct Position {
-    x: f64,
-    y: f64,
+#[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq)]
+pub struct Position {
+    pub x: f64,
+    pub y: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize_repr)]
@@ -76,29 +76,29 @@ pub struct Filter {
 
 impl Entity {
 
-    fn get_positions(&self) -> Vec<Position> {
+    pub fn get_positions(&self) -> Vec<Position> {
         match &self.ty {
             EntityType::TransportBelt => vec![self.position],
-            EntityType::AssemblingMachine { recipe } => get_surrounding(self.position),
-            EntityType::FilterInserter { filters } => vec![self.position],
+            EntityType::AssemblingMachine { recipe: _ } => get_surrounding(self.position),
+            EntityType::FilterInserter { filters: _ } => vec![self.position],
             EntityType::ElectricFurnace {  } => get_surrounding(self.position),
-            EntityType::UndergroundBelt { belt_type } => vec![self.position],
-            EntityType::ChemicalPlant { recipe } => get_surrounding(self.position),
-            EntityType::Splitter { filter, input_priority, output_priority } => todo!(),
+            EntityType::UndergroundBelt { belt_type: _ } => vec![self.position],
+            EntityType::ChemicalPlant { recipe: _ } => get_surrounding(self.position),
+            EntityType::Splitter { filter: _, input_priority: _, output_priority: _ } => todo!(),
             EntityType::StoneWall {  } => vec![self.position],
         }
     }
 
-    fn output_positions(&self)-> Vec<Position> {
+    pub fn output_positions(&self)-> Vec<Position> {
         match &self.ty {
-            EntityType::FilterInserter { filters } => todo!(),
+            EntityType::FilterInserter { filters: _ } => todo!(),
             _ => self.get_positions()
         }
     }
 
-    fn input_positions(&self)-> Vec<Position> {
+    pub fn input_positions(&self)-> Vec<Position> {
         match &self.ty {
-            EntityType::FilterInserter { filters } => todo!(),
+            EntityType::FilterInserter { filters: _ } => todo!(),
             _ => self.get_positions()
         }
     }
