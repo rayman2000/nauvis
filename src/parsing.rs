@@ -7,9 +7,9 @@ use std::error::Error;
 use std::fs;
 use std::io::Read;
 
-use crate::entities::Entity;
+use crate::entities::{Blueprint, Entity};
 
-pub fn decode_blueprint(input: &str) -> Result<Vec<Entity>, Box<dyn Error>> {
+pub fn decode_blueprint(input: &str) -> Result<Blueprint, Box<dyn Error>> {
     // Trim leading and trailing spaces.
     let input = input.trim();
 
@@ -40,7 +40,7 @@ pub fn decode_blueprint(input: &str) -> Result<Vec<Entity>, Box<dyn Error>> {
     let entities: Vec<Entity> = serde_json::from_value(entities.clone())
         .expect("entities should be valid");
 
-    Ok(entities)
+    Ok(Blueprint::new(entities))
 }
 
 type Recipies = HashMap<String, Vec<String>>;

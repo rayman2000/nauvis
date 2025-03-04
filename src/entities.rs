@@ -1,6 +1,20 @@
 use serde::{Deserialize, Serialize};
 use serde_repr::Deserialize_repr;
 
+#[derive(Debug)]
+pub struct Blueprint {
+    entities: Vec<Entity>,
+}
+
+impl Blueprint {
+    pub fn new(entities: Vec<Entity>) -> Self {
+        Blueprint { entities }
+    }
+
+    pub fn entityAt(&self, pos: Position) -> Option<Entity> {
+        self.entities.iter().find(|entity| entity.get_positions().contains(pos))
+    }
+}
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 struct Position {
