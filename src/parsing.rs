@@ -7,8 +7,7 @@ use std::error::Error;
 use std::fs;
 use std::io::Read;
 
-#[allow(unused_imports)]
-use crate::entities::{Entity, TransportBelt};
+use crate::entities::Entity;
 
 pub fn decode_blueprint(input: &str) -> Result<Vec<Entity>, Box<dyn Error>> {
     // Trim leading and trailing spaces.

@@ -1,7 +1,8 @@
 use serde::{Deserialize, Serialize};
 use serde_repr::Deserialize_repr;
 
-#[derive(Debug, Serialize, Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 struct Position {
     x: f64,
     y: f64,
@@ -26,79 +27,56 @@ pub struct Entity {
     ty: EntityType,
 }
 
-// TODO: populate the enums here.
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(tag = "name", rename_all = "kebab-case")]
 enum EntityType {
     TransportBelt,
     #[serde(rename = "assembling-machine-1")]
-    AssemblingMachine {},
-    FilterInserter {},
+    AssemblingMachine  {
+        recipe: String,
+    },
+    FilterInserter {
+        filters: Vec<Filter>,
+    },
     ElectricFurnace {},
-    UndergroundBelt {},
-    ChemicalPlant {},
-    Splitter {},
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct TransportBelt {
-    position: Position,
-    direction: Direction,
-    entity_number: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct AssemblingMachine {
-    position: Position,
-    direction: Direction,
-    entity_number: i32,
-    recipe: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct ElectricFurnace {
-    position: Position,
-    direction: Direction,
-    entity_number: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct UndergroundBelt {
-    position: Position,
-    direction: Direction,
-    entity_number: i32,
-    #[serde(rename = "type")]
-    belt_type: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct ChemicalPlant {
-    position: Position,
-    direction: Direction,
-    entity_number: i32,
-    recipe: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Splitter {
-    position: Position,
-    direction: Direction,
-    entity_number: i32,
-    filter: String,
-    input_priority: String,
-    output_priority: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct FilterInserter {
-    position: Position,
-    direction: Direction,
-    entity_number: i32,
-    filters: Vec<Filter>,
+    UndergroundBelt {
+        #[serde(rename = "type")]
+        belt_type: String,
+    },
+    ChemicalPlant {
+        recipe: String,
+    },
+    Splitter {
+        filter: String,
+        input_priority: String,
+        output_priority: String,
+    },
+    StoneWall {},
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Filter {
     index: i32,
     name: String,
+}
+
+impl Entity {
+    fn output_positions(&self)-> Vec<Position> {
+        match &self.ty {
+            EntityType::TransportBelt => vec![self.position],
+            EntityType::AssemblingMachine { recipe } => todo!(),
+            EntityType::FilterInserter { filters } => todo!(),
+            EntityType::ElectricFurnace {  } => todo!(),
+            EntityType::UndergroundBelt { belt_type } => todo!(),
+            EntityType::ChemicalPlant { recipe } => todo!(),
+            EntityType::Splitter { filter, input_priority, output_priority } => todo!(),
+            EntityType::StoneWall {  } => todo!(),
+        }
+    }
+}
+
+fn get_surrounding(position: Position) -> Vec<Position> {
+    vec![
+        
+    ]
 }
