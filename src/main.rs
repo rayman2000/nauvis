@@ -1,6 +1,7 @@
+mod bug;
 mod entities;
 mod parsing;
-mod bug;
+mod type_check;
 
 use parsing::{decode_blueprint, get_recipes_map};
 
