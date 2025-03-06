@@ -1,7 +1,8 @@
+mod bug;
 mod entities;
 mod parsing;
-mod bug;
 
+use bug::check_for_bugs;
 use parsing::{decode_blueprint, get_recipes_map};
 
 fn main() {
@@ -10,7 +11,18 @@ fn main() {
 
     let encoded = include_str!("../blueprint.b64");
     match decode_blueprint(encoded) {
-        Ok(decoded) => println!("Decoded: {:?}", decoded),
         Err(e) => eprintln!("Error decoding: {}", e),
+        Ok(decoded) => {
+            println!("Decoded: {:?}", decoded);
+            let bugged = check_for_bugs(decoded);
+            match bugged.len() {
+                0 => println!("Bug freedom achieved!"),
+                _ => println!(
+                    "Found {} unsafe entities: {:?}",
+                    bugged.len(),
+                    bugged
+                ),
+            }
+        }
     }
 }

@@ -11,7 +11,8 @@ impl Blueprint {
         Blueprint { entities }
     }
 
-    pub fn entityAt(&self, pos: &Position) -> Option<&Entity> {
+    // TODO this is hella inefficient
+    pub fn entity_at(&self, pos: &Position) -> Option<&Entity> {
         self.entities.iter().find(|entity| entity.get_positions().contains(pos))
     }
 }
@@ -22,7 +23,33 @@ pub struct Position {
     pub y: f64,
 }
 
-#[derive(Debug, Serialize, Deserialize_repr)]
+impl Position {
+    pub fn new(x: f64, y: f64) -> Self {
+        Position { x, y }
+    }
+
+    pub fn above(&self) -> Position {
+        Position::new(self.x, self.y + 1.0)
+    }
+
+    pub fn below(&self) -> Position {
+        Position::new(self.x, self.y - 1.0)
+    }
+
+    pub fn left(&self) -> Position {
+        Position::new(self.x - 1.0, self.y)
+    }
+
+    pub fn right(&self) -> Position {
+        Position::new(self.x + 1.0, self.y)
+    }
+
+    pub fn neighbours(&self) -> Vec<Position> {
+        vec![self.above(), self.below(), self.left(), self.right()]
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize_repr, PartialEq, Clone)]
 #[repr(i32)]
 #[serde(untagged)]
 pub enum Direction {
@@ -32,7 +59,7 @@ pub enum Direction {
     West = 3,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 pub struct Entity {
     position: Position,
     direction: Direction,
@@ -41,9 +68,9 @@ pub struct Entity {
     ty: EntityType,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 #[serde(tag = "name", rename_all = "kebab-case")]
-enum EntityType {
+pub enum EntityType {
     TransportBelt,
     #[serde(rename = "assembling-machine-1")]
     AssemblingMachine  {
@@ -68,7 +95,7 @@ enum EntityType {
     StoneWall {},
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 pub struct Filter {
     index: i32,
     name: String,
@@ -101,6 +128,10 @@ impl Entity {
             EntityType::FilterInserter { filters: _ } => todo!(),
             _ => self.get_positions()
         }
+    }
+
+    pub fn entity_type(&self) -> &EntityType {
+        &self.ty
     }
 }
 
