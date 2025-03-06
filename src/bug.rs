@@ -1,6 +1,6 @@
 //use std::collections::HashSet;
 
-use crate::entities::{Blueprint, Entity, EntityType, Position};
+use crate::entities::{Blueprint, Direction, Entity, EntityType, Position};
 
 pub fn check_for_bugs(bp: Blueprint) -> Vec<Entity> {
 
@@ -20,9 +20,9 @@ pub fn check_for_bugs(bp: Blueprint) -> Vec<Entity> {
         queue.push(pos_top);
         queue.push(pos_bot);
         visited.push(pos_top);
-        visited.push(pos_top.above());
+        visited.push(pos_top.shift_one(Direction::North));
         visited.push(pos_bot);
-        visited.push(pos_bot.below());
+        visited.push(pos_bot.shift_one(Direction::South));
     }
     for y in (min_y+1)..(max_y-2) {
         let pos_left = Position:: new(min_x as f64 + 0.5, y as f64 + 0.5);
@@ -30,9 +30,9 @@ pub fn check_for_bugs(bp: Blueprint) -> Vec<Entity> {
         queue.push(pos_left);
         queue.push(pos_right);
         visited.push(pos_left);
-        visited.push(pos_left.left());
+        visited.push(pos_left.shift_one(Direction::West));
         visited.push(pos_right);
-        visited.push(pos_right.right());
+        visited.push(pos_right.shift_one(Direction::East));
     }
 
     // While queue non-empty
@@ -49,7 +49,7 @@ pub fn check_for_bugs(bp: Blueprint) -> Vec<Entity> {
                 }
             }
             Some(ent) => {
-                match ent.entity_type(){
+                match ent.ty{
                     // For a wall, do nothing
                     EntityType::StoneWall {  } => {},
                     _ => {

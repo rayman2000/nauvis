@@ -26,32 +26,6 @@ pub struct Position {
     pub y: f64,
 }
 
-impl Position {
-    pub fn new(x: f64, y: f64) -> Self {
-        Position { x, y }
-    }
-
-    pub fn above(&self) -> Position {
-        Position::new(self.x, self.y + 1.0)
-    }
-
-    pub fn below(&self) -> Position {
-        Position::new(self.x, self.y - 1.0)
-    }
-
-    pub fn left(&self) -> Position {
-        Position::new(self.x - 1.0, self.y)
-    }
-
-    pub fn right(&self) -> Position {
-        Position::new(self.x + 1.0, self.y)
-    }
-
-    pub fn neighbours(&self) -> Vec<Position> {
-        vec![self.above(), self.below(), self.left(), self.right()]
-    }
-}
-
 impl std::ops::Add for Position {
     type Output = Self;
 
@@ -64,6 +38,60 @@ impl std::ops::Add for Position {
 }
 
 impl Position {
+    pub fn new(x: f64, y: f64) -> Self {
+        Position { x, y }
+    }
+
+    pub fn neighbours(&self) -> Vec<Position> {
+        vec![
+            self.shift_one(Direction::North),
+            self.shift_one(Direction::East),
+            self.shift_one(Direction::South),
+            self.shift_one(Direction::West),
+        ]
+    }
+
+    pub fn three_by_three(&self) -> Vec<Position> {
+        vec![
+            Position {
+                x: self.x - 1.0,
+                y: self.y - 1.0,
+            },
+            Position {
+                x: self.x - 1.0,
+                y: self.y,
+            },
+            Position {
+                x: self.x - 1.0,
+                y: self.y + 1.0,
+            },
+            Position {
+                x: self.x,
+                y: self.y - 1.0,
+            },
+            Position {
+                x: self.x,
+                y: self.y,
+            },
+            Position {
+                x: self.x,
+                y: self.y + 1.0,
+            },
+            Position {
+                x: self.x + 1.0,
+                y: self.y - 1.0,
+            },
+            Position {
+                x: self.x + 1.0,
+                y: self.y,
+            },
+            Position {
+                x: self.x + 1.0,
+                y: self.y + 1.0,
+            },
+        ]
+    }
+
     fn scale(self, f: f64) -> Position {
         Position {
             x: self.x * f,
@@ -71,7 +99,7 @@ impl Position {
         }
     }
 
-    fn shift_one(self, d: Direction) -> Position {
+    pub fn shift_one(self, d: Direction) -> Position {
         self + d.as_position()
     }
 
@@ -88,7 +116,7 @@ impl std::cmp::Ord for Position {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize_repr, Clone, Copy)]
+#[derive(Debug, Serialize, Deserialize_repr, Clone, Copy, PartialEq)]
 #[repr(i32)]
 #[serde(untagged)]
 pub enum Direction {
@@ -132,7 +160,7 @@ impl Direction {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 pub struct Entity {
     pub position: Position,
     pub direction: Direction,
@@ -179,13 +207,13 @@ impl Entity {
         match &self.ty {
             EntityType::TransportBelt => vec![self.position],
             EntityType::AssemblingMachine { recipe: _ } => {
-                get_surrounding(self.position)
+                self.position.three_by_three()
             }
             EntityType::FilterInserter { filters: _ } => vec![self.position],
-            EntityType::ElectricFurnace {} => get_surrounding(self.position),
+            EntityType::ElectricFurnace {} => self.position.three_by_three(),
             EntityType::UndergroundBelt { belt_type: _ } => vec![self.position],
             EntityType::ChemicalPlant { recipe: _ } => {
-                get_surrounding(self.position)
+                self.position.three_by_three()
             }
             EntityType::Splitter {
                 filter: _,
@@ -228,46 +256,4 @@ impl EntityType {
             _ => false,
         }
     }
-
-}
-
-fn get_surrounding(position: Position) -> Vec<Position> {
-    vec![
-        Position {
-            x: position.x - 1.0,
-            y: position.y - 1.0,
-        },
-        Position {
-            x: position.x - 1.0,
-            y: position.y,
-        },
-        Position {
-            x: position.x - 1.0,
-            y: position.y + 1.0,
-        },
-        Position {
-            x: position.x,
-            y: position.y - 1.0,
-        },
-        Position {
-            x: position.x,
-            y: position.y,
-        },
-        Position {
-            x: position.x,
-            y: position.y + 1.0,
-        },
-        Position {
-            x: position.x + 1.0,
-            y: position.y - 1.0,
-        },
-        Position {
-            x: position.x + 1.0,
-            y: position.y,
-        },
-        Position {
-            x: position.x + 1.0,
-            y: position.y + 1.0,
-        },
-    ]
 }
