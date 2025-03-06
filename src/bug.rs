@@ -5,7 +5,6 @@ use crate::entities::{Blueprint, Direction, Entity, EntityType, Position};
 pub fn check_for_bugs(bp: Blueprint) -> Vec<Entity> {
 
     let (min_x, min_y, max_x, max_y) = get_borders(&bp);
-
     
     let mut queue: Vec<Position> = vec![];
 
@@ -14,7 +13,7 @@ pub fn check_for_bugs(bp: Blueprint) -> Vec<Entity> {
     let mut unsafe_entities: Vec<Entity> = vec![];
 
     // Add all border fields to queue and visited. Also add the positions on step outside to visited
-    for x in min_x..(max_x - 1) {
+    for x in min_x..max_x {
         let pos_bot = Position:: new(x as f64 + 0.5, min_y as f64 + 0.5);
         let pos_top = Position:: new(x as f64 + 0.5, max_y as f64 - 0.5);
         queue.push(pos_top);
@@ -24,7 +23,7 @@ pub fn check_for_bugs(bp: Blueprint) -> Vec<Entity> {
         visited.push(pos_bot);
         visited.push(pos_bot.shift_one(Direction::South));
     }
-    for y in (min_y+1)..(max_y-2) {
+    for y in min_y..max_y {
         let pos_left = Position:: new(min_x as f64 + 0.5, y as f64 + 0.5);
         let pos_right = Position:: new(max_x as f64 - 0.5, y as f64 + 0.5);
         queue.push(pos_left);

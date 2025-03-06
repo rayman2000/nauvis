@@ -1,5 +1,7 @@
 #![allow(dead_code, unused_variables)]
 
+use std::fmt;
+
 use serde::{Deserialize, Serialize};
 use serde_repr::Deserialize_repr;
 
@@ -20,7 +22,7 @@ impl Blueprint {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, PartialOrd)]
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, PartialOrd)]
 pub struct Position {
     pub x: f64,
     pub y: f64,
@@ -34,6 +36,12 @@ impl std::ops::Add for Position {
             x: self.x + rhs.x,
             y: self.y + rhs.y,
         }
+    }
+}
+
+impl fmt::Debug for Position {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({}, {})", self.x, self.y)
     }
 }
 
@@ -178,7 +186,7 @@ pub enum EntityType {
         recipe: String,
     },
     FilterInserter {
-        filters: Vec<Filter>,
+        filters: Option<Vec<Filter>>,
     },
     ElectricFurnace {},
     UndergroundBelt {
