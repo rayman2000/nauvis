@@ -20,6 +20,41 @@ impl Blueprint {
             .iter()
             .find(|entity| entity.get_positions().contains(pos))
     }
+
+    pub fn get_borders(&self) -> (i32, i32, i32, i32) {
+        let (min_x, min_y, max_x, max_y) = self.entities.iter().flat_map(|entity| entity.get_positions()).fold((f64::MAX, f64::MAX, f64::MIN, f64::MIN), |(min_x, min_y, max_x, max_y), pos| {
+            (min_x.min(pos.x), min_y.min(pos.y), max_x.max(pos.x), max_y.max(pos.y))
+        });
+        (min_x.floor() as i32, min_y.floor() as i32, max_x.ceil() as i32, max_y.ceil() as i32)
+
+    }
+
+    pub fn render(&self) -> String {
+        let (min_x, min_y, max_x, max_y) = self.get_borders();
+
+        println!("min_x: {}, min_y: {}, max_x: {}, max_y: {}", min_x, min_y, max_x, max_y);
+
+        let mut grid: Vec<Vec<String>> = vec![vec!["  ".to_string(); (max_x - min_x) as usize]; (max_y - min_y) as usize];
+        
+        
+        let x_offset = min_x as f64 + 0.5;
+        let y_offset = min_y as f64 + 0.5;
+
+        for ent in &self.entities {
+            for pos in ent.get_positions() {
+                
+                let x = (pos.x - x_offset) as usize;
+                let y = (pos.y - y_offset) as usize;
+
+                println!("Inserting {:?} at ({},{})", ent, x, y);
+                grid.get_mut(y ).unwrap().insert(x, ent.render());
+            }
+        }
+    grid.iter()
+    .map(|row| row.join(""))
+    .collect::<Vec<String>>()
+    .join("\n")
+}
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq, PartialOrd)]
@@ -244,6 +279,42 @@ impl Entity {
             EntityType::FilterInserter { filters: _ } => todo!(),
             _ => self.get_positions(),
         }
+    }
+
+    // For more arrows, see http://xahlee.info/comp/unicode_arrows.html
+    pub fn render(&self) -> String {
+        match &self.ty {
+            EntityType::FilterInserter { filters: _ } => match self.direction {
+                Direction::North => "⏫".to_string(),
+                Direction::East => "⏩".to_string(),
+                Direction::South => "⏬".to_string(),
+                Direction::West => "⏪".to_string(),
+            }
+            EntityType::AssemblingMachine { recipe: _} => "🛠️".to_string(),
+            EntityType::TransportBelt => match self.direction {
+                Direction::North => "⬆️".to_string(),
+                Direction::East => "➡️".to_string(),
+                Direction::South => "⬇️".to_string(),
+                Direction::West => "⬅️".to_string(),
+            },
+            EntityType::ElectricFurnace {  } => "🔥".to_string(),
+            // TODO how does one differentiate in and out? ↤ ↦ ↥ ↧
+            EntityType::UndergroundBelt { belt_type } => match self.direction {
+                Direction::North => "⤒".to_string(),
+                Direction::East => "⇥".to_string(),
+                Direction::South => "⤓".to_string(),
+                Direction::West => "⇤".to_string(),
+            },
+            EntityType::ChemicalPlant { recipe } => todo!(),
+            EntityType::Splitter { filter, input_priority, output_priority } => match self.direction {
+                Direction::North => "⇞".to_string(),
+                Direction::East => "⇻".to_string(),
+                Direction::South => "⇟".to_string(),
+                Direction::West => "⇺".to_string(),
+            },
+            EntityType::StoneWall {  } => "🧱".to_string(),
+        }
+    
     }
 }
 

@@ -4,7 +4,7 @@ use crate::entities::{Blueprint, Direction, Entity, EntityType, Position};
 
 pub fn check_for_bugs(bp: Blueprint) -> Vec<Entity> {
 
-    let (min_x, min_y, max_x, max_y) = get_borders(&bp);
+    let (min_x, min_y, max_x, max_y) = bp.get_borders();
     
     let mut queue: Vec<Position> = vec![];
 
@@ -74,14 +74,5 @@ pub fn check_for_bugs(bp: Blueprint) -> Vec<Entity> {
     unsafe_entities
 }
 
-
-fn get_borders(bp: &Blueprint) -> (i32, i32, i32, i32) {
-    
-    let (min_x, min_y, max_x, max_y) = bp.entities.iter().flat_map(|entity| entity.get_positions()).fold((f64::MAX, f64::MAX, f64::MIN, f64::MIN), |(min_x, min_y, max_x, max_y), pos| {
-        (min_x.min(pos.x), min_y.min(pos.y), max_x.max(pos.x), max_y.max(pos.y))
-    });
-    (min_x.floor() as i32, min_y.floor() as i32, max_x.ceil() as i32, max_y.ceil() as i32)
-
-}
 
 
