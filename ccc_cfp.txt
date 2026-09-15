@@ -1,0 +1,37 @@
+40C3 CFP
+
+Title: 
+
+Abstract:
+
+Have you ever pasted a bunch of blueprints in Factorio, only to
+discover that the whole thing doesn't work, and it turns out
+to be that one flipped inserter after a 3am coffee bender?
+What if you could mathematically *guarantee* that your factory
+does what you want it to do?
+We present NAUVIS (Nearly AUtomated Verification of Industrial Systems),
+a state-of-the-art formal verifier for factories.
+Using NAUVIS, you can prove that your factories are belt safe, bug-free, 
+and, most importantly, productive!
+Along the way, we demonstrate the basic principles of formal
+verification and how to design practical verifiers.
+
+Description:
+
+First, we figure out what it even means for factories to be "correct":
+machines receive their expected inputs, the belt network is well-formed,
+and the bugs stay outside.
+
+Next, we describe how factories can be represented as network graphs
+with constraints and correctness properties can be represented as
+constraints over these graphs.
+
+Then we show how to encode these graphs and their constraints as logical
+formulas, which can be checked by automatic solvers.
+
+The methodology underlying NAUVIS is widely used for designing formal
+verification tooling, and many of the principles and limitations we
+present are applicable to other domains, such as programming languages
+and hardware specification.
+
+THE FACTORY MUST (verifiably) GROW.
